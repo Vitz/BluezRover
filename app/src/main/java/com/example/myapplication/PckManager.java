@@ -12,9 +12,9 @@ public class PckManager {
         byte[] pck;
         String strLeft =  Integer.toString(left);
         String strRight =  Integer.toString(right);
-        strLeft = fillByZero(strLeft,3);
-        strRight = fillByZero(strRight,3);
-        String iterator = fillByZero(Integer.toString(pckIterator),3);
+        strLeft = fillByZero(strLeft,4);
+        strRight = fillByZero(strRight,4);
+        String iterator = fillByZero(Integer.toString(pckIterator),8);
         pckIterator++;
         if (pckIterator>999)pckIterator=0;
         pck = (strLeft + strRight + iterator).getBytes();

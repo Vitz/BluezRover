@@ -74,7 +74,9 @@ public class MainActivity extends Activity
                         }
 
                         if (btDev.isConnected()) {
-                        btDev.sendData(PckManager.buildMovePck(1, 1));
+                            int left = Integer.parseInt(((String) tvProgressLabel1.getText()).replaceAll("\\s",""));
+                            int right = Integer.parseInt(((String) tvProgressLabel2.getText()).replaceAll("\\s",""));
+                        btDev.sendData(PckManager.buildMovePck(left, right));
                     } }
                 }
             });

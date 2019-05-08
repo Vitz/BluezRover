@@ -54,7 +54,7 @@ public class MyBluetoothService {
         }
 
         public void run() {
-            mmBuffer = new byte[9];
+            mmBuffer = new byte[16];
             int numBytes; // bytes returned from read()
 
             // Keep listening to the InputStream until an exception occurs.
