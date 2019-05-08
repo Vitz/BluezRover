@@ -68,7 +68,7 @@ public class MainActivity extends Activity
                 public void run() {
                     while (true){
                         try {
-                            sleep(1000);
+                            sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
