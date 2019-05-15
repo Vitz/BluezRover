@@ -4,29 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-    <!--<Button-->
-        <!--android:id="@+id/button"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="15dp"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:text="Connect" />-->
-    <Switch
-        android:id="@+id/switch1"
+    tools:context=".MainActivity"
+    android:screenOrientation="portrait">
+    <TextView
+        android:id="@+id/textViewState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="TextView" />
+    <Button
+        android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="40dp"
         android:layout_centerHorizontal="true"
-        android:text="Connected" />
+        android:text="Stop connection" />
+
     <ListView
         android:id="@+id/listview"
-        android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:layout_marginTop="50dp">
-    </ListView>
+        android:layout_marginTop="50dp"
+        android:scrollbars="vertical"></ListView>
+
     <LinearLayout
         android:layout_below="@+id/listview"
         android:layout_width="match_parent"
@@ -73,4 +74,6 @@
                 android:rotation="270" />
         </LinearLayout>
     </LinearLayout>
+
+
 </RelativeLayout>

@@ -1,18 +1,18 @@
 package com.example.myapplication;
+
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.myapplication.devices.BTDev;
-import com.example.myapplication.devices.MyBluetoothService;
 
 import static java.lang.Thread.sleep;
 
@@ -20,10 +20,13 @@ public class MainActivity extends Activity
 {
     TextView tvProgressLabel1;
     TextView tvProgressLabel2;
+    TextView tvStateLabel;
     ListView listView;
-    Switch switchConnectionState;
+    Button buttonStopConnection;
     static BTDev btDev;
-    SliderController sController;
+    Thread thread;
+    boolean stopThread;
+
 
     public static BTDev getDevice() {
         return btDev;
@@ -33,6 +36,7 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         SeekBar seekBarLeft = findViewById(R.id.seekBarLeft);
         seekBarLeft.setOnSeekBarChangeListener(seekBarChangeListenerLeft);
         SeekBar seekBarRight = findViewById(R.id.seekBarRight);
@@ -41,10 +45,12 @@ public class MainActivity extends Activity
         tvProgressLabel1.setText(" " + Helpers.normalizeTo0(seekBarLeft.getProgress()));
         tvProgressLabel2 = findViewById(R.id.textViewRight);
         tvProgressLabel2.setText(" " + Helpers.normalizeTo0(seekBarRight.getProgress()));
-        switchConnectionState = findViewById(R.id.switch1);
-        switchConnectionState.setChecked(false);
-        switchConnectionState.setOnCheckedChangeListener(switchListener);
+        tvStateLabel = findViewById(R.id.textViewState);
+        tvStateLabel.setText("Hello!");
 
+        buttonStopConnection = findViewById(R.id.button1);
+        buttonStopConnection.setOnClickListener(buttonListener);
+        stopThread = false;
         Log.i("BTDev", "try init");
         btDev =  new BTDev();
         btDev.initDevice();
@@ -59,16 +65,25 @@ public class MainActivity extends Activity
     ListView.OnItemClickListener choseDeviceListener = new ListView.OnItemClickListener(){
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            stopThread = false;
             String chosenElement = (String) parent.getItemAtPosition(position);
             Log.i("MainActivity", "chosen device:" + chosenElement);
             btDev.initConnection(position);
 
-            Thread thread = new Thread(new Runnable() {
+            thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (true){
+                        if (stopThread) {
+                            try {
+                                sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        }
                         try {
-                            sleep(100);
+                            sleep(30);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -76,13 +91,27 @@ public class MainActivity extends Activity
                         if (btDev.isConnected()) {
                             int left = Integer.parseInt(((String) tvProgressLabel1.getText()).replaceAll("\\s",""));
                             int right = Integer.parseInt(((String) tvProgressLabel2.getText()).replaceAll("\\s",""));
-                        btDev.sendData(PckManager.buildMovePck(left, right));
-                    } }
+                            byte[] data  = PckManager.buildMovePck(left, right);
+                            btDev.sendData(data);
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tvStateLabel.setText(btDev.getLastSentString());
+                                }
+                            });
+                        }
+                    else{
+                            try {
+                                sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
             });
             thread.start();
-
-
             try {
                 sleep(100);
             } catch (InterruptedException e) {
@@ -91,12 +120,16 @@ public class MainActivity extends Activity
         }
     };
 
-    Switch.OnCheckedChangeListener switchListener = new Switch.OnCheckedChangeListener() {
+    Button.OnClickListener buttonListener = new Button.OnClickListener() {
         @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (!isChecked) {
-                btDev.cancel();
+        public void onClick(View buttonView) {
+            stopThread = true;
+            try {
+                sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            btDev.cancel();
         }
     };
 
